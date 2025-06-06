@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>完整太阳系模拟</title>
+    <style>
+        canvas { background: #000; }
+        body { margin: 0; overflow: hidden; }
+    </style>
+</head>
+<body>
+    <canvas id="solarSystem"></canvas>
+
+    <script>
+        const canvas = document.getElementById('solarSystem');
+        const ctx = canvas.getContext('2d');
+        
+        // 设置画布尺寸
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // 天体类（增加自转属性）
+        class CelestialBody {
+            constructor(radius, orbitRadius, color, speed, rotationSpeed, parent = null) {
+                this.radius = radius;
+                this.orbitRadius = orbitRadius;
+                this.color = color;
+                this.angle = Math.random() * Math.PI * 2;
+                this.speed = speed;
+                this.rotation = 0;
+                this.rotationSpeed = rotationSpeed;
+                this.parent = parent;
+                this.children = [];
+                // 逆时针旋转标记（金星为-1）
+                this.rotationDirection = 1; 
+            }
+
+            update() {
+                this.angle += this.speed;
+                this.rotation += this.rotationSpeed * this.rotationDirection;
+                
+                if (this.parent) {
+                    this.x = this.parent.x + Math.cos(this.angle) * this.orbitRadius;
+                    this.y = this.parent.y + Math.sin(this.angle) * this.orbitRadius;
+                } else {
+                    this.x = canvas.width/2;
+                    this.y = canvas.height/2;
+                }
+                this.children.forEach(child => child.update());
+            }
+
+            draw() {
+                // 绘制轨道
+                if (this.parent) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
+                    ctx.arc(this.parent.x, this.parent.y, this.orbitRadius, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation);
+                
+                // 绘制天体
+                ctx.beginPath();
+                ctx.fillStyle = this.color;
+                ctx.arc(0, 0, this.radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.restore();
+            }
+        }
+
+        // 创建太阳
+        const sun = new CelestialBody(30, 0, '#FFD700', 0, 0.005);
+
+        // 行星参数（包含卫星系统）
+        const planets = [
+            { // 水星
+                radius: 8, orbit: 80, color: '#A0522D', speed: 0.02, rotation: 0.01
+            },
+            { // 金星（设置逆向旋转）
+                radius: 12, orbit: 120, color: '#DEB887', speed: 0.015, rotation: -0.008,
+                rotationDirection: -1
+            },
+            { // 地球（带月球）
+                radius: 13, orbit: 160, color: '#4169E1', speed: 0.01, rotation: 0.015,
+                satellites: [
+                    { radius: 4, orbit: 25, color: '#808080', speed: 0.05, rotation: 0.01 }
+                ]
+            },
+            { // 火星（带火卫）
+                radius: 9, orbit: 200, color: '#CD5C5C', speed: 0.008, rotation: 0.012,
+                satellites: [
+                    { radius: 2, orbit: 15, color: '#A9A9A9', speed: 0.03, rotation: 0.02 },
+                    { radius: 2, orbit: 25, color: '#696969', speed: 0.025, rotation: 0.015 }
+                ]
+            },
+            { // 木星（带伽利略卫星）
+                radius: 25, orbit: 280, color: '#DAA520', speed: 0.005, rotation: 0.02,
+                satellites: [
+                    { radius: 5, orbit: 40, color: '#CD853F', speed: 0.03, rotation: 0.01 },
+                    { radius: 4, orbit: 60, color: '#8B4513', speed: 0.025, rotation: 0.015 },
+                    { radius: 6, orbit: 80, color: '#A0522D', speed: 0.02, rotation: 0.02 },
+                    { radius: 5, orbit: 100, color: '#8B0000', speed: 0.015, rotation: 0.01 }
+                ]
+            },
+            { // 土星（带主要卫星）
+                radius: 20, orbit: 340, color: '#CD853F', speed: 0.004, rotation: 0.018,
+                satellites: [
+                    { radius: 6, orbit: 50, color: '#D2B48C', speed: 0.025, rotation: 0.01 },
+                    { radius: 5, orbit: 70, color: '#BC8F8F', speed: 0.02, rotation: 0.015 }
+                ]
+            }
+        ];
+
+        // 创建行星系统
+        planets.forEach(p => {
+            const planet = new CelestialBody(
+                p.radius,
+                p.orbit,
+                p.color,
+                p.speed,
+                p.rotation,
+                sun
+            );
+            if (p.rotationDirection) planet.rotationDirection = p.rotationDirection;
+            
+            // 添加卫星
+            if (p.satellites) {
+                p.satellites.forEach(s => {
+                    const satellite = new CelestialBody(
+                        s.radius,
+                        s.orbit,
+                        s.color,
+                        s.speed,
+                        s.rotation,
+                        planet
+                    );
+                    planet.children.push(satellite);
+                });
+            }
+            sun.children.push(planet);
+        });
+
+        // 动画循环
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // 应用视图变换
+            ctx.save();
+            ctx.translate(canvas.width/2 + offsetX, canvas.height/2 + offsetY);
+            ctx.scale(scale, scale);
+            
+            sun.update();
+            sun.draw();
+            sun.children.forEach(planet => {
+                planet.draw();
+                planet.children.forEach(moon => moon.draw());
+            });
+            
+            ctx.restore();
+            requestAnimationFrame(animate);
+        }
+
+        // 交互控制变量
+        let isDragging = false;
+        let lastX = 0, lastY = 0;
+        let offsetX = 0, offsetY = 0;
+        let scale = 1;
+
+        // 鼠标事件监听
+        canvas.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            lastX = e.clientX;
+            lastY = e.clientY;
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                offsetX += e.clientX - lastX;
+                offsetY += e.clientY - lastY;
+                lastX = e.clientX;
+                lastY = e.clientY;
+            }
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        canvas.addEventListener('wheel', (e) => {
+            e.preventDefault();
+            scale += e.deltaY * -0.001;
+            scale = Math.min(Math.max(0.3, scale), 5);
+        });
+
+        // 启动动画
+        animate();
+    </script>
+</body>
+</html>

@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>3D太阳系模拟系统</title>
+    <style>body { margin: 0; overflow: hidden; }</style>
+</head>
+<body>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script>
+        let scene, camera, renderer, controls;
+        const textureLoader = new THREE.TextureLoader();
+        
+        // 天体参数配置 [1,3](@ref)
+        const CELESTIAL_BODIES = [
+            { // 太阳
+                name: 'Sun', radius: 25, distance: 0, speed: 0, 
+                texture: 'sun.jpg', emissive: 0xFFD700, hasGlow: true
+            },
+            { // 水星
+                name: 'Mercury', radius: 3.8, distance: 60, speed: 0.05,
+                texture: 'mercury.jpg', rotationSpeed: 0.04
+            },
+            { // 金星
+                name: 'Venus', radius: 9.4, distance: 90, speed: 0.04,
+                texture: 'venus.jpg', rotationSpeed: -0.015
+            },
+            { // 地球
+                name: 'Earth', radius: 10, distance: 140, speed: 0.03,
+                texture: 'earth.jpg', rotationSpeed: 0.02,
+                moon: { radius: 2, distance: 20, speed: 0.06 }
+            },
+            { // 火星
+                name: 'Mars', radius: 5.3, distance: 180, speed: 0.025,
+                texture: 'mars.jpg', rotationSpeed: 0.018
+            },
+            { // 木星
+                name: 'Jupiter', radius: 22, distance: 240, speed: 0.015,
+                texture: 'jupiter.jpg', rotationSpeed: 0.03
+            },
+            { // 土星
+                name: 'Saturn', radius: 18, distance: 300, speed: 0.012,
+                texture: 'saturn.jpg', rotationSpeed: 0.025,
+                ring: { inner: 25, outer: 35, texture: 'saturn_ring.png' }
+            },
+            { // 天王星
+                name: 'Uranus', radius: 15, distance: 340, speed: 0.009,
+                texture: 'uranus.jpg', rotationSpeed: -0.01, tilt: 97
+            },
+            { // 海王星
+                name: 'Neptune', radius: 14, distance: 380, speed: 0.007,
+                texture: 'neptune.jpg', rotationSpeed: 0.015
+            }
+        ];
+
+        function init() {
+            // 场景初始化 [2,4](@ref)
+            scene = new THREE.Scene();
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 2000);
+            camera.position.set(0, 150, 500);
+            
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            document.body.appendChild(renderer.domElement);
+
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+
+            createStars();      // 创建星空背景 [4](@ref)
+            createSolarSystem();// 创建天体系统
+            animate();
+        }
+
+        function createStars() {
+            // 创建粒子系统星空 [4](@ref)
+            const starsGeometry = new THREE.BufferGeometry();
+            const starCount = 10000;
+            const positions = new Float32Array(starCount * 3);
+            
+            for(let i=0; i<starCount*3; i+=3) {
+                positions[i] = (Math.random() - 0.5) * 2000;
+                positions[i+1] = (Math.random() - 0.5) * 2000;
+                positions[i+2] = (Math.random() - 0.5) * 2000;
+            }
+            
+            starsGeometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+            const starsMaterial = new THREE.PointsMaterial({ size: 0.7, color: 0xFFFFFF });
+            scene.add(new THREE.Points(starsGeometry, starsMaterial));
+        }
+
+        function createSolarSystem() {
+            CELESTIAL_BODIES.forEach(body => {
+                const group = new THREE.Group();
+                const geometry = new THREE.SphereGeometry(body.radius, 64, 32);
+                
+                // 材质处理 [1,9](@ref)
+                let material;
+                if(body.emissive) { // 太阳自发光材质
+                    material = new THREE.MeshBasicMaterial({
+                        map: textureLoader.load(body.texture),
+                        emissive: body.emissive,
+                        emissiveIntensity: 2
+                    });
+                    createSunGlow(body); // 太阳光晕效果 [9](@ref)
+                } else {
+                    material = new THREE.MeshPhongMaterial({
+                        map: textureLoader.load(body.texture),
+                        bumpScale: 0.05,
+                        shininess: 100
+                    });
+                }
+
+                const planet = new THREE.Mesh(geometry, material);
+                
+                // 行星轨道 [6](@ref)
+                if(body.distance > 0) {
+                    const orbitGeometry = new THREE.RingGeometry(
+                        body.distance - 1, body.distance + 1, 64
+                    );
+                    const orbitMaterial = new THREE.MeshBasicMaterial({
+                        color: 0x888888, side: THREE.DoubleSide, transparent: true, opacity: 0.3
+                    });
+                    const orbit = new THREE.Mesh(orbitGeometry, orbitMaterial);
+                    orbit.rotation.x = -Math.PI/2;
+                    scene.add(orbit);
+                }
+
+                // 行星环 [3,7](@ref)
+                if(body.ring) {
+                    const ringGeometry = new THREE.RingGeometry(
+                        body.ring.inner, body.ring.outer, 64
+                    );
+                    const ringMaterial = new THREE.MeshPhongMaterial({
+                        map: textureLoader.load(body.ring.texture),
+                        side: THREE.DoubleSide,
+                        transparent: true
+                    });
+                    const ring = new THREE.Mesh(ringGeometry, ringMaterial);
+                    ring.rotation.x = Math.PI/2;
+                    planet.add(ring);
+                }
+
+                // 卫星系统 [1](@ref)
+                if(body.moon) {
+                    const moonGroup = new THREE.Group();
+                    const moonGeometry = new THREE.SphereGeometry(body.moon.radius);
+                    const moonMaterial = new THREE.MeshPhongMaterial({
+                        map: textureLoader.load('moon.jpg')
+                    });
+                    const moon = new THREE.Mesh(moonGeometry, moonMaterial);
+                    moon.position.x = body.moon.distance;
+                    moonGroup.add(moon);
+                    planet.add(moonGroup);
+                }
+
+                group.add(planet);
+                group.userData = body;
+                scene.add(group);
+            });
+        }
+
+        function createSunGlow(sunConfig) {
+            // 太阳光晕效果 [9](@ref)
+            const lensFlare = new THREE.LensFlare(
+                textureLoader.load('lensflare0.png'), 350, 0.0, THREE.AdditiveBlending
+            );
+            lensFlare.add(textureLoader.load('lensflare3.png'), 60, 0.6);
+            lensFlare.position.copy(sunConfig.position);
+            scene.add(lensFlare);
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            controls.update();
+            
+            scene.traverse(obj => {
+                if(obj.userData?.distance > 0) {
+                    // 公转运动 [5,6](@ref)
+                    obj.rotation.y += obj.userData.speed;
+                    // 自转运动
+                    obj.children[0].rotation.y += obj.userData.rotationSpeed || 0;
+                    
+                    // 卫星运动
+                    if(obj.children[0].children[0]) {
+                        obj.children[0].children[0].rotation.y += 0.05;
+                    }
+                }
+            });
+            
+            renderer.render(scene, camera);
+        }
+
+        // 初始化及窗口适应
+        init();
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
+    </script>
+</body>
+</html>

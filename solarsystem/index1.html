@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>高性能太阳系模拟</title>
+    <style>
+        canvas { background: #000; }
+        body { margin: 0; overflow: hidden; }
+    </style>
+</head>
+<body>
+    <canvas id="solarSystem"></canvas>
+
+    <script>
+        const canvas = document.getElementById('solarSystem');
+        const ctx = canvas.getContext('2d');
+        
+        // 性能配置
+        const CONFIG = {
+            MAX_FPS: 60,
+            SHOW_ORBIT: true,
+            LAZY_UPDATE: 3,
+            SCALE_RANGE: [0.2, 8]
+        };
+
+        // 初始化画布
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // 天体类（优化版）
+        class CelestialBody {
+            constructor(config) {
+                Object.assign(this, {
+                    radius: 10,
+                    orbitRadius: 100,
+                    color: '#FFF',
+                    speed: 0.01,
+                    rotationSpeed: 0,
+                    parent: null,
+                    children: [],
+                    rotationDirection: 1,
+                    orbitTilt: 0,
+                    gradientCache: null
+                }, config);
+
+                this.angle = Math.random() * Math.PI * 2;
+                this.rotation = 0;
+                this.initGradient();
+            }
+
+            initGradient() {
+                if (!this.color.stops) return;
+
+                const offscreen = document.createElement('canvas');
+                offscreen.width = this.radius * 4;
+                offscreen.height = this.radius * 4;
+                const octx = offscreen.getContext('2d');
+                
+                const gradient = octx.createRadialGradient(
+                    this.radius * 2,
+                    this.radius * 2,
+                    0,
+                    this.radius * 2,
+                    this.radius * 2,
+                    this.radius * 2
+                );
+                
+                this.color.stops.forEach(s => 
+                    gradient.addColorStop(s.position, s.color)
+                );
+                
+                octx.fillStyle = gradient;
+                octx.beginPath();
+                octx.arc(
+                    this.radius * 2,
+                    this.radius * 2,
+                    this.radius * 2,
+                    0,
+                    Math.PI * 2
+                );
+                octx.fill();
+                this.gradientCache = offscreen;
+            }
+
+            update() {
+                this.angle += this.speed;
+                this.rotation += this.rotationSpeed * this.rotationDirection;
+                
+                if (this.parent) {
+                    const baseX = this.parent.x;
+                    const baseY = this.parent.y;
+                    this.x = baseX + Math.cos(this.angle + this.orbitTilt) * this.orbitRadius;
+                    this.y = baseY + Math.sin(this.angle) * this.orbitRadius;
+                } else {
+                    this.x = canvas.width/2;
+                    this.y = canvas.height/2;
+                }
+            }
+
+            draw(ctx) {
+                if (CONFIG.SHOW_ORBIT && this.parent) {
+                    ctx.beginPath();
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+                    ctx.arc(this.parent.x, this.parent.y, this.orbitRadius, 0, Math.PI*2);
+                    ctx.stroke();
+                }
+
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.rotate(this.rotation);
+                
+                if (this.gradientCache) {
+                    ctx.drawImage(
+                        this.gradientCache,
+                        -this.radius * 2,
+                        -this.radius * 2,
+                        this.radius * 4,
+                        this.radius * 4
+                    );
+                } else {
+                    ctx.beginPath();
+                    ctx.arc(0, 0, this.radius, 0, Math.PI*2);
+                    ctx.fillStyle = this.color;
+                    ctx.fill();
+                }
+                
+                ctx.restore();
+            }
+        }
+
+        // 天体系统配置
+        const sun = new CelestialBody({
+            radius: 30,
+            color: '#FFD700',
+            rotationSpeed: 0.005
+        });
+
+        const createPlanet = config => {
+            const planet = new CelestialBody({
+                ...config,
+                parent: sun
+            });
+            
+            (config.satellites || []).forEach(s => 
+                planet.children.push(new CelestialBody({
+                    ...s,
+                    parent: planet
+                }))
+            );
+            
+            return planet;
+        };
+
+        const planets = [
+            createPlanet({
+                radius: 8, orbitRadius: 80, 
+                color: '#A0522D', speed: 0.02, 
+                rotationSpeed: 0.01
+            }),
+            createPlanet({
+                radius: 12, orbitRadius: 120,
+                color: '#DEB887', speed: 0.015,
+                rotationSpeed: -0.008,
+                rotationDirection: -1
+            }),
+            createPlanet({
+                radius: 13, orbitRadius: 160,
+                color: '#4169E1', speed: 0.01,
+                rotationSpeed: 0.015,
+                satellites: [
+                    { radius: 4, orbitRadius: 25, color: '#808080', speed: 0.05 }
+                ]
+            }),
+            createPlanet({
+                radius: 9, orbitRadius: 200,
+                color: '#CD5C5C', speed: 0.008,
+                rotationSpeed: 0.012,
+                satellites: [
+                    { radius: 2, orbitRadius: 15, color: '#A9A9A9', speed: 0.03 },
+                    { radius: 2, orbitRadius: 25, color: '#696969', speed: 0.025 }
+                ]
+            }),
+            createPlanet({
+                radius: 25, orbitRadius: 280,
+                color: {
+                    stops: [
+                        { position: 0, color: '#DAA520' },
+                        { position: 0.5, color: '#B8860B' },
+                        { position: 1, color: '#8B4513' }
+                    ]
+                },
+                speed: 0.005,
+                rotationSpeed: 0.02,
+                satellites: [
+                    { radius: 5, orbitRadius: 40, color: '#CD853F', speed: 0.03 },
+                    { radius: 4, orbitRadius: 60, color: '#8B4513', speed: 0.025 },
+                    { radius: 6, orbitRadius: 80, color: '#A0522D', speed: 0.02 },
+                    { radius: 5, orbitRadius: 100, color: '#8B0000', speed: 0.015 }
+                ]
+            }),
+            createPlanet({
+                radius: 20, orbitRadius: 340,
+                color: {
+                    stops: [
+                        { position: 0, color: '#CD853F' },
+                        { position: 0.6, color: '#D2B48C' },
+                        { position: 1, color: '#BC8F8F' }
+                    ]
+                },
+                speed: 0.004,
+                rotationSpeed: 0.018,
+                orbitTilt: Math.PI/12,
+                satellites: [
+                    { radius: 6, orbitRadius: 50, color: '#D2B48C', speed: 0.025 },
+                    { radius: 5, orbitRadius: 70, color: '#BC8F8F', speed: 0.02 }
+                ]
+            }),
+            createPlanet({
+                radius: 18, orbitRadius: 400,
+                color: '#AFEEEE',
+                speed: 0.003,
+                rotationSpeed: -0.015,
+                rotationDirection: -1,
+                // orbitTilt: Math.PI/2 * 0.98,
+                satellites: [
+                    { radius: 4, orbitRadius: 30, color: '#778899', speed: 0.02 },
+                    { radius: 3, orbitRadius: 45, color: '#708090', speed: 0.018 },
+                    { radius: 5, orbitRadius: 60, color: '#B0C4DE', speed: 0.015 },
+                    { radius: 4, orbitRadius: 75, color: '#87CEEB', speed: 0.013 },
+                    { radius: 6, orbitRadius: 90, color: '#4682B4', speed: 0.01 }
+                ]
+            }),
+            createPlanet({
+                radius: 17, orbitRadius: 450,
+                color: '#4169E1',
+                speed: 0.0025,
+                rotationSpeed: 0.016,
+                satellites: [
+                    { radius: 7, orbitRadius: 35, color: '#00BFFF', speed: 0.015 },
+                    { radius: 3, orbitRadius: 50, color: '#1E90FF', speed: 0.012 },
+                    { radius: 4, orbitRadius: 65, color: '#87CEFA', speed: 0.01 }
+                ]
+            })
+        ];
+
+        sun.children = planets;
+
+        // 动画循环控制
+        let lastFrame = 0;
+        let deltaAccumulator = 0;
+        const FPS_INTERVAL = 1000 / CONFIG.MAX_FPS;
+
+        function animate(timestamp) {
+            requestAnimationFrame(animate);
+            
+            const delta = timestamp - lastFrame;
+            if (delta < FPS_INTERVAL && !document.hidden) return;
+            
+            deltaAccumulator += delta;
+            lastFrame = timestamp;
+
+            // 批量更新
+            function update(body) {
+                body.update();
+                body.children.forEach(update);
+            }
+            update(sun);
+
+            // 批量绘制
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.save();
+            ctx.translate(
+                canvas.width/2 + offsetX, 
+                canvas.height/2 + offsetY
+            );
+            ctx.scale(scale, scale);
+            
+            function draw(body) {
+                body.draw(ctx);
+                body.children.forEach(draw);
+            }
+            draw(sun);
+            
+            ctx.restore();
+        }
+
+        // 交互系统
+        let isDragging = false;
+        let lastX = 0, lastY = 0;
+        let offsetX = 0, offsetY = 0;
+        let scale = 1;
+
+        canvas.addEventListener('mousedown', e => {
+            isDragging = true;
+            lastX = e.clientX;
+            lastY = e.clientY;
+        });
+
+        canvas.addEventListener('mousemove', e => {
+            if (!isDragging) return;
+            offsetX += e.clientX - lastX;
+            offsetY += e.clientY - lastY;
+            lastX = e.clientX;
+            lastY = e.clientY;
+        });
+
+        canvas.addEventListener('mouseup', () => isDragging = false);
+        
+        canvas.addEventListener('wheel', e => {
+            e.preventDefault();
+            scale += e.deltaY * -0.001;
+            scale = Math.max(CONFIG.SCALE_RANGE[0], 
+                Math.min(CONFIG.SCALE_RANGE[1], scale));
+        }, { passive: false });
+
+        // 启动动画
+        animate(0);
+
+        // 后台降频
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                CONFIG.MAX_FPS = 15;
+            } else {
+                CONFIG.MAX_FPS = 60;
+            }
+        });
+    </script>
+</body>
+</html>

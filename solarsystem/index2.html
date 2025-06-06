@@ -1,0 +1,121 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>太阳系模拟</title>
+</head>
+<body style="margin: 0; background: black;">
+    <canvas id="solarSystem"></canvas>
+
+    <script>
+        const canvas = document.getElementById('solarSystem');
+        const ctx = canvas.getContext('2d');
+
+        // 设置画布尺寸
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        // 天体数据（包含名称和细节）
+        const sun = {
+            x: canvas.width/2,
+            y: canvas.height/2,
+            radius: 40,
+            color: '#FFD700',
+            name: '太阳'
+        };
+
+        const planets = [
+            { name: '水星', radius: 10, orbit: 60,  speed: 0.02, color: '#A0522D', ring: false },
+            { name: '金星', radius: 14, orbit: 100, speed: 0.015, color: '#DEB887', ring: false },
+            { name: '地球', radius: 16, orbit: 140, speed: 0.01,  color: '#4169E1', ring: false },
+            { name: '火星', radius: 12, orbit: 180, speed: 0.008, color: '#CD5C5C', ring: false },
+            { name: '木星', radius: 32, orbit: 240, speed: 0.005, color: '#DAA520', ring: false },
+            { name: '土星', radius: 28, orbit: 300, speed: 0.004, color: '#F4A460', ring: true },
+            { name: '天王星', radius: 22, orbit: 350, speed: 0.003, color: '#87CEEB', ring: false },
+            { name: '海王星', radius: 20, orbit: 400, speed: 0.002, color: '#4682B4', ring: false }
+        ];
+
+        // 初始化行星角度
+        planets.forEach(planet => {
+            planet.angle = Math.random() * Math.PI * 2;
+        });
+
+        // 创建渐变效果
+        function createGradient(ctx, x, y, r, color) {
+            const gradient = ctx.createRadialGradient(
+                x, y, r*0.3,
+                x, y, r*1.2
+            );
+            gradient.addColorStop(0, color);
+            gradient.addColorStop(1, 'rgba(255,255,255,0.2)');
+            return gradient;
+        }
+
+        function drawSolarSystem() {
+            ctx.fillStyle = 'black';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // 绘制太阳（带光晕效果）
+            const sunGradient = createGradient(ctx, sun.x, sun.y, sun.radius, sun.color);
+            ctx.beginPath();
+            ctx.arc(sun.x, sun.y, sun.radius, 0, Math.PI * 2);
+            ctx.fillStyle = sunGradient;
+            ctx.fill();
+
+            // 绘制太阳名称
+            ctx.fillStyle = 'white';
+            ctx.font = '20px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText(sun.name, sun.x, sun.y + sun.radius + 25);
+
+            // 绘制行星
+            planets.forEach(planet => {
+                planet.angle += planet.speed;
+                const x = sun.x + planet.orbit * Math.cos(planet.angle);
+                const y = sun.y + planet.orbit * Math.sin(planet.angle);
+
+                // 绘制轨道
+                ctx.beginPath();
+                ctx.arc(sun.x, sun.y, planet.orbit, 0, Math.PI * 2);
+                ctx.strokeStyle = 'rgba(255, 255, 255, 0.15)';
+                ctx.stroke();
+
+                // 绘制行星（带渐变质感）
+                const planetGradient = createGradient(ctx, x, y, planet.radius, planet.color);
+                ctx.beginPath();
+                ctx.arc(x, y, planet.radius, 0, Math.PI * 2);
+                ctx.fillStyle = planetGradient;
+                ctx.fill();
+
+                // 绘制行星环（土星）
+                if(planet.ring) {
+                    ctx.beginPath();
+                    ctx.ellipse(x, y, planet.radius*1.8, planet.radius*0.6, planet.angle, 0, Math.PI*2);
+                    ctx.strokeStyle = '#8B7355';
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+                }
+
+                // 绘制行星名称
+                ctx.fillStyle = 'white';
+                ctx.font = '12px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText(planet.name, x, y + planet.radius + 15);
+            });
+
+            requestAnimationFrame(drawSolarSystem);
+        }
+
+        // 启动动画
+        drawSolarSystem();
+
+        // 窗口大小变化处理
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            sun.x = canvas.width/2;
+            sun.y = canvas.height/2;
+        });
+    </script>
+</body>
+</html>
