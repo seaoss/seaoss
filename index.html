@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Seaoss 是专业的云服务提供商，提供 CloudDrive 云存储、TempMail 临时邮箱、New API 接口服务、NextChat 智能聊天机器人、Web Hosting 免费网页托管和 FreeDomain 免费域名服务等一站式云解决方案。">
+    <meta name="keywords" content="Seaoss, 云服务, CloudDrive, 云存储, TempMail, 临时邮箱, New API, API接口, NextChat, 智能聊天机器人, Web Hosting, 免费网页托管, FreeDomain, 免费域名服务">
+    <meta name="robots" content="index, follow" />
+    <meta name="author" content="Seaoss">
+    <meta property="og:title" content="Seaoss - 专业云服务提供商">
+    <meta property="og:description" content="Seaoss 是专业的云服务提供商，提供 CloudDrive 云存储、TempMail 临时邮箱、New API 接口服务、NextChat 智能聊天机器人、Web Hosting 免费网页托管和 FreeDomain 免费域名服务等一站式云解决方案。">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://www.seaoss.com">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Seaoss - 专业云服务提供商">
+    <meta name="twitter:description" content="Seaoss 是专业的云服务提供商，提供 CloudDrive 云存储、TempMail 临时邮箱、New API 接口服务、NextChat 智能聊天机器人、Web Hosting 免费网页托管和 FreeDomain 免费域名服务等一站式云解决方案。">
+    <title>Seaoss - 专业云服务提供商 | CloudDrive | TempMail | New API | NextChat | Web Hosting | FreeDomain</title>
+    <link rel="icon" href="https://www.seaoss.com/favicon.svg" type="image/svg+xml">
+  	<script>
+			(function(){
+				var bp = document.createElement('script');
+				var curProtocol = window.location.protocol.split(':')[0];
+				if (curProtocol === 'https') {
+					bp.src = 'https://zz.bdstatic.com/linksubmit/push.js';
+				}
+				else {
+					bp.src = 'http://push.zhanzhang.baidu.com/push.js';
+				}
+				var s = document.getElementsByTagName("script")[0];
+				s.parentNode.insertBefore(bp, s);
+			})();
+		</script>
+    <script charset="UTF-8" id="LA_COLLECT" src="//sdk.51.la/js-sdk-pro.min.js"></script>
+    <script>LA.init({id:"KYQeb37YZMaGbsKw",ck:"KYQeb37YZMaGbsKw"})</script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f5f7fa;
+        }
+
+        /* 导航栏 */
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1rem 0;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            text-decoration: none;
+            color: white;
+        }
+
+        .nav-links {
+            display: flex;
+            list-style: none;
+        }
+
+        .nav-links li {
+            margin-left: 2rem;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #ffd700;
+        }
+
+        /* 英雄区域 */
+        .hero {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 4rem 0;
+            text-align: center;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            animation: fadeInUp 1s ease;
+        }
+
+        .hero p {
+            font-size: 1.2rem;
+            margin-bottom: 2rem;
+            opacity: 0.9;
+            animation: fadeInUp 1s ease 0.2s both;
+        }
+
+        /* 公司简介 */
+        .about {
+            max-width: 1200px;
+            margin: 4rem auto;
+            padding: 0 2rem;
+            animation: fadeInUp 1s ease 0.4s both;
+        }
+
+        .about h2 {
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            color: #667eea;
+            text-align: center;
+        }
+
+        .about-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .about-text {
+            font-size: 1.1rem;
+            line-height: 1.8;
+        }
+
+        .about-text h3 {
+            margin-top: 1.5rem;
+            margin-bottom: 0.5rem;
+            color: #764ba2;
+        }
+
+        .about-image {
+            text-align: center;
+        }
+
+        .about-image img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        /* 产品矩阵 */
+        .products {
+            background-color: white;
+            padding: 4rem 0;
+        }
+
+        .products-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .products h2 {
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #667eea;
+            text-align: center;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .product-card {
+            background-color: #f5f7fa;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .product-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #667eea;
+        }
+
+        .product-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
+        .product-card p {
+            margin-bottom: 1rem;
+            color: #666;
+        }
+
+        .product-card ul {
+            margin-bottom: 1.5rem;
+            padding-left: 1.5rem;
+        }
+
+        .product-card li {
+            margin-bottom: 0.5rem;
+            color: #666;
+        }
+
+        .product-link {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border-radius: 5px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: transform 0.3s ease;
+        }
+
+        .product-link:hover {
+            transform: translateY(-2px);
+        }
+
+        /* SEO优化 */
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: bold;
+            color: #333;
+        }
+
+        p {
+            margin-bottom: 1rem;
+        }
+
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+
+        /* 结构化数据 */
+        .schema-markup {
+            display: none;
+        }
+
+        /* 页脚 */
+        footer {
+            background-color: #333;
+            color: white;
+            padding: 3rem 0;
+            margin-top: 4rem;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+        }
+
+        .footer-section h3 {
+            margin-bottom: 1rem;
+            color: #667eea;
+        }
+
+        .footer-section p {
+            margin-bottom: 1rem;
+            opacity: 0.8;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 0.5rem;
+        }
+
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.8;
+            transition: opacity 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            opacity: 1;
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            opacity: 0.6;
+        }
+
+        /* 动画 */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 768px) {
+            nav {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-links {
+                margin-top: 1rem;
+            }
+
+            .nav-links li {
+                margin-left: 1rem;
+                margin-right: 1rem;
+            }
+
+            .hero h1 {
+                font-size: 2rem;
+            }
+
+            .about-content {
+                grid-template-columns: 1fr;
+            }
+
+            .product-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="#" class="logo">Seaoss</a>
+            <ul class="nav-links">
+                <li><a href="#about">关于我们</a></li>
+                <li><a href="#products">产品矩阵</a></li>
+                <li><a href="#contact">联系我们</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="hero">
+        <div class="hero-content">
+            <h1>Seaoss - 专业云服务提供商</h1>
+            <p>创新驱动，为您提供安全、高效、便捷的云服务解决方案</p>
+        </div>
+    </section>
+
+    <section id="about" class="about">
+        <h2>公司简介</h2>
+        <div class="about-content">
+            <div class="about-text">
+                <p>Seaoss 是一家专注于云服务领域的创新型科技公司，致力于为个人和企业用户提供安全、高效、便捷的云服务解决方案。</p>
+                <h3>我们的使命</h3>
+                <p>通过技术创新，让云服务变得简单易用，为用户创造更大的价值。</p>
+                <h3>我们的价值观</h3>
+                <p>客户至上、创新驱动、诚信为本、合作共赢</p>
+            </div>
+            <div class="about-image">
+                <img src="https://s.coze.cn/image/X6JCxQRstaM/" alt="云服务科技图案" title="云服务科技图案">
+            </div>
+        </div>
+    </section>
+
+    <section id="products" class="products">
+        <div class="products-container">
+            <h2>产品矩阵</h2>
+            <div class="product-grid">
+                <div class="product-card">
+                    <div class="product-icon">📁</div>
+                    <h3>CloudDrive - 云存储服务</h3>
+                    <p>安全可靠的云存储服务，让您的数据随时随地可用。</p>
+                    <ul>
+                        <li>无限存储空间</li>
+                        <li>文件同步与分享</li>
+                        <li>多设备访问</li>
+                    </ul>
+                    <a href="https://pan.seaoss.com" class="product-link" target="_blank">立即体验</a>
+                </div>
+
+                <div class="product-card">
+                    <div class="product-icon">📧</div>
+                    <h3>TempMail - 临时邮箱</h3>
+                    <p>临时邮箱服务，保护您的隐私，防止垃圾邮件骚扰。</p>
+                    <ul>
+                        <li>一键生成临时邮箱</li>
+                        <li>自动接收邮件</li>
+                        <li>无需注册</li>
+                    </ul>
+                    <a href="https://temp.seaoss.com" class="product-link" target="_blank">立即体验</a>
+                </div>
+
+                <div class="product-card">
+                    <div class="product-icon">🔌</div>
+                    <h3>New API - 接口服务</h3>
+                    <p>强大的 API 服务平台，为开发者提供丰富的接口资源。</p>
+                    <ul>
+                        <li>丰富的 API 接口</li>
+                        <li>高可用性能</li>
+                        <li>详细的文档支持</li>
+                    </ul>
+                    <a href="https://api.seaoss.com" class="product-link" target="_blank">立即体验</a>
+                </div>
+
+                <div class="product-card">
+                    <div class="product-icon">💬</div>
+                    <h3>NextChat - 智能聊天机器人</h3>
+                    <p>智能聊天机器人服务，为您提供便捷的沟通体验。</p>
+                    <ul>
+                        <li>自然语言处理</li>
+                        <li>多场景应用</li>
+                        <li>自定义配置</li>
+                    </ul>
+                    <a href="https://chat.seaoss.com" class="product-link" target="_blank">立即体验</a>
+                </div>
+
+                <div class="product-card">
+                    <div class="product-icon">🌐</div>
+                    <h3>Web Hosting - 免费网页托管</h3>
+                    <p>免费的网页托管服务，让您的网站轻松上线。</p>
+                    <ul>
+                        <li>免费域名</li>
+                        <li>无限流量</li>
+                        <li>一键部署</li>
+                    </ul>
+                    <a href="https://free.seaoss.com" class="product-link" target="_blank">立即体验</a>
+                </div>
+
+                <div class="product-card">
+                    <div class="product-icon">🔤</div>
+                    <h3>FreeDomain - 免费域名服务</h3>
+                    <p>免费的域名注册和管理服务，让您轻松拥有专属域名。</p>
+                    <ul>
+                        <li>免费域名注册</li>
+                        <li>一键解析</li>
+                        <li>DNS管理</li>
+                    </ul>
+                    <a href="https://dns.seaoss.com" class="product-link" target="_blank">立即体验</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer id="contact">
+        <div class="footer-container">
+            <div class="footer-section">
+                <h3>Seaoss</h3>
+                <p>专业云服务提供商，为您提供安全、高效、便捷的云服务解决方案</p>
+            </div>
+            <div class="footer-section">
+                <h3>快速链接</h3>
+                <ul class="footer-links">
+                    <li><a href="#about">关于我们</a></li>
+                    <li><a href="#products">产品矩阵</a></li>
+                    <li><a href="https://www.seaoss.com" target="_blank">官方网站</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>联系方式</h3>
+                <p>邮箱: inbox@seaoss.com</p>
+                <p>电话: +86 123 4567 8900</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Seaoss. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- 结构化数据 -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Seaoss",
+        "url": "https://www.seaoss.com",
+        "logo": "https://www.seaoss.com/wp-content/uploads/2025/04/cropped-logo-150x150.png",
+        "contactPoint": {
+            "@type": "ContactPoint",
+            "telephone": "+86 123 4567 8900",
+            "contactType": "customer service",
+            "email": "inbox@seaoss.com"
+        },
+        "sameAs": [
+            "https://www.seaoss.com",
+            "https://pan.seaoss.com",
+            "https://temp.seaoss.com",
+            "https://api.seaoss.com",
+            "https://chat.seaoss.com",
+            "https://free.seaoss.com",
+            "https://dns.seaoss.com"
+        ]
+    }
+    </script>
+
+    <script>
+        // 平滑滚动
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href')).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
